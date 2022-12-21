@@ -41,3 +41,33 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Foreground1
+    uniqueID: 1152975835
+    locked: 0
+  - name: Foreground2
+    uniqueID: 3150562695
+    locked: 0
+  - name: Foreground3
+    uniqueID: 3033125517
+    locked: 0
+  - name: Foreground4
+    uniqueID: 933618397
+    locked: 0
+  - name: Foreground5
+    uniqueID: 958607051
+    locked: 0
+  - name: Foreground6
+    uniqueID: 1615731995
+    locked: 0
+  - name: Foreground7
+    uniqueID: 2387793287
+    locked: 0
+  - name: Foreground8
+    uniqueID: 1860443945
+    locked: 0
+  - name: Foreground9
+    uniqueID: 1608814847
+    locked: 0
+  - name: UI99
+    uniqueID: 3202694891
+    locked: 0
