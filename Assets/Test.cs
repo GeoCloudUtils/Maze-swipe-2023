@@ -7,14 +7,12 @@ using System;
 public class Test : MonoBehaviour
 {
     public Transform _panel;
-    public Cell cell;
     public InputManager InputManager;
 
     private bool _isRotating = false;
     private void Start()
     {
         InputManager.OnSwipe += OnSwipe;
-        cell.GetTopBorder();
     }
 
     private void OnSwipe(InputManager.Direction swipeDirection)
@@ -26,10 +24,10 @@ public class Test : MonoBehaviour
         switch (swipeDirection)
         {
             case InputManager.Direction.Left:
-                RotatePanel(90f);
+                RotatePanel(-90f);
                 break;
             case InputManager.Direction.Right:
-                RotatePanel(-90f);
+                RotatePanel(90f);
                 break;
             default:
                 break;
@@ -44,7 +42,6 @@ public class Test : MonoBehaviour
         _panel.DORotate(newRotation, .5f).SetEase(Ease.OutExpo).OnComplete(() =>
         {
             _isRotating = false;
-            cell.GetTopBorder();
         });
     }
 }

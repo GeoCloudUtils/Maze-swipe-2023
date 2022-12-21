@@ -4,20 +4,13 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
+[ExecuteInEditMode]
 public class Cell : MonoBehaviour
 {
-    public RectTransform[] Borders;
-
-    public Transform GetTopBorder()
+    public Image Image;
+    public bool Enabled = true;
+    private void Update()
     {
-        foreach (RectTransform border in Borders)
-        {
-            Image img = border.GetComponent<Image>();
-            img.color = Color.black;
-        }
-        RectTransform topBorder = Borders.OrderBy(x => x.anchoredPosition.y).Last();
-        Image borderImage = topBorder.GetComponent<Image>();
-        borderImage.color = Color.red;
-        return topBorder.transform;
+        Image.enabled = Enabled;
     }
 }
