@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace ScriptUtils.GameUtils
 {
+    [ExecuteInEditMode]
     public class GridConstructorSystem : MonoBehaviour
     {
         /// <summary>
