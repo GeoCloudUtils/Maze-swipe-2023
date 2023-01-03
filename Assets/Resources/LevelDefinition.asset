@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef616c8d745799d4cbba63a745395cc8, type: 3}
+  m_Name: LevelDefinition
+  m_EditorClassIdentifier: 
+  levelData: {fileID: 0}
+  AllLevels:
+  - level: Level_1 (3x3)
+    levelData: 121100103
+    gridLength: 3
+    maxMoves: 0
+    activableCellsCount: 0
+  - level: Level_2 (3x3)
+    levelData: 000000000
+    gridLength: 3
+    maxMoves: 0
+    activableCellsCount: 0
+  - level: Level_3 (3x3)
+    levelData: 000000000
+    gridLength: 3
+    maxMoves: 0
+    activableCellsCount: 0
+  - level: Level_4 (3x3)
+    levelData: 000000000
+    gridLength: 3
+    maxMoves: 0
+    activableCellsCount: 0
+  - level: Level_5 (7x7)
+    levelData: 0000000000000000000000000000000000000000000000000
+    gridLength: 7
+    maxMoves: 0
+    activableCellsCount: 0
+  - level: Level_6 (5x5)
+    levelData: 0000000000000000000000000
+    gridLength: 5
+    maxMoves: 0
+    activableCellsCount: 0
+  - level: Level_7 (4x4)
+    levelData: 0000000000000000
+    gridLength: 4
+    maxMoves: 0
+    activableCellsCount: 0
+  data: 1211100010331011
+  rows: 4
+  cols: 4
+  MaxValue: 5
+  ActivableCellsCount: 0

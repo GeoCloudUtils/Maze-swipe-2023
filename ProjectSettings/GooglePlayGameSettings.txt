@@ -1,0 +1,11 @@
+lastUpgrade=01014
+proj.pluginVersion=0.10.14
+proj.AppId=333746489154
+proj.classDir=Assets
+proj.ConstantsClassName=GPGSIds
+and.ResourceData=%3c%3fxml+version%3d%221.0%22+encoding%3d%22utf-8%22%3f%3e%0d%0a%3c%21--Google+Play+game+services+IDs.+Save+this+file+as+res%2fvalues%2fgames-ids.xml+in+your+project.--%3e%0d%0a%3cresources%3e%0d%0a++%3c%21--app_id--%3e%0d%0a++%3cstring+name%3d%22app_id%22+translatable%3d%22false%22%3e333746489154%3c%2fstring%3e%0d%0a++%3c%21--package_name--%3e%0d%0a++%3cstring+name%3d%22package_name%22+translatable%3d%22false%22%3ecom.overactgames.maze.blocks%3c%2fstring%3e%0d%0a++%3c%21--achievement+A+good+start--%3e%0d%0a++%3cstring+name%3d%22achievement_a_good_start%22+translatable%3d%22false%22%3eCgkIwo7dptsJEAIQAQ%3c%2fstring%3e%0d%0a++%3c%21--achievement+Enthusiast--%3e%0d%0a++%3cstring+name%3d%22achievement_enthusiast%22+translatable%3d%22false%22%3eCgkIwo7dptsJEAIQAg%3c%2fstring%3e%0d%0a++%3c%21--achievement+Trainee--%3e%0d%0a++%3cstring+name%3d%22achievement_trainee%22+translatable%3d%22false%22%3eCgkIwo7dptsJEAIQAw%3c%2fstring%3e%0d%0a++%3c%21--achievement+Brainy--%3e%0d%0a++%3cstring+name%3d%22achievement_brainy%22+translatable%3d%22false%22%3eCgkIwo7dptsJEAIQBA%3c%2fstring%3e%0d%0a++%3c%21--achievement+Advanced--%3e%0d%0a++%3cstring+name%3d%22achievement_advanced%22+translatable%3d%22false%22%3eCgkIwo7dptsJEAIQBQ%3c%2fstring%3e%0d%0a++%3c%21--achievement+Expert--%3e%0d%0a++%3cstring+name%3d%22achievement_expert%22+translatable%3d%22false%22%3eCgkIwo7dptsJEAIQBg%3c%2fstring%3e%0d%0a++%3c%21--achievement+Master--%3e%0d%0a++%3cstring+name%3d%22achievement_master%22+translatable%3d%22false%22%3eCgkIwo7dptsJEAIQBw%3c%2fstring%3e%0d%0a++%3c%21--achievement+Master+of+the+mind--%3e%0d%0a++%3cstring+name%3d%22achievement_master_of_the_mind%22+translatable%3d%22false%22%3eCgkIwo7dptsJEAIQCQ%3c%2fstring%3e%0d%0a++%3c%21--leaderboard+Players--%3e%0d%0a++%3cstring+name%3d%22leaderboard_players%22+translatable%3d%22false%22%3eCgkIwo7dptsJEAIQCA%3c%2fstring%3e%0d%0a%3c%2fresources%3e
+and.ClientId=333746489154-1blt9mlp1ea8kq0a7la0pr474shds8je.apps.googleusercontent.com
+android.SetupDone=true
+and.BundleId=com.overactgames.maze.blocks
+App.NearbdServiceId=com.overactgames.maze.blocks
+android.NearbySetupDone=true
