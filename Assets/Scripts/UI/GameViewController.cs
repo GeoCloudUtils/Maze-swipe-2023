@@ -3,8 +3,21 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
+using DG.Tweening;
+using System.Collections.Generic;
+using System.Linq;
+
+public enum ColorScheme
+{
+    LIGHT = 0,
+    DARK = 1
+}
+
 public class GameViewController : MonoBehaviour
 {
+    [SerializeField] private Color colorOnLightScheme;
+    [SerializeField] private Color colorOnDarkScheme;
+
     [SerializeField] private GameObject menu;
 
     [SerializeField] private Button menuButton;
@@ -22,28 +35,73 @@ public class GameViewController : MonoBehaviour
     [SerializeField] private Button iapButton;
     [SerializeField] private Button leaderboardButton;
     [SerializeField] private Button achievementsButton;
+    [SerializeField] private Button colorSchemeChangeButton;
 
     [SerializeField] private float hideDelay = 5f;
 
+    private Coroutine menuCoroutine;
 
-    private void Start()
+    public ColorScheme colorScheme = ColorScheme.LIGHT;
+
+    private ColorScheme lastSavedColorScheme;
+
+    private List<GameViewElement> gameViewElements;
+
+    private IEnumerator Start()
     {
-        soundButton.onClick.AddListener(() => SetSound(true));
-        sfxButton.onClick.AddListener(() => SetSfx(true));
-        iapButton.onClick.AddListener(SetIap);
+        soundButton.onClick.AddListener(() => OnSoundButtonClick(true));
+        sfxButton.onClick.AddListener(() => OnSfxButtonClick(true));
+        iapButton.onClick.AddListener(OnIapButtonClick);
         leaderboardButton.onClick.AddListener(ShowLeaderboard);
         achievementsButton.onClick.AddListener(ShowAchievements);
+        colorSchemeChangeButton.onClick.AddListener(() => ChangeColorScheme(true));
         if (!PlayerPrefs.HasKey("SFX"))
         {
             PlayerPrefs.SetInt("SFX", 1);
         }
-        SetSfx(false);
-        SetSound(false);
-        menuButton.onClick.AddListener(OpenMenu);
+        OnSfxButtonClick(false);
+        OnSoundButtonClick(false);
+        menuButton.onClick.AddListener(ShowMenuPanel);
+        if (!PlayerPrefs.HasKey("COLOR_SCHEME"))
+        {
+            PlayerPrefs.SetInt("COLOR_SCHEME", 0);
+        }
+        colorScheme = (ColorScheme)PlayerPrefs.GetInt("COLOR_SCHEME");
+        lastSavedColorScheme = colorScheme;
+        while (!GameplayController.Instance.SpawnComplete)
+        {
+            yield return null;
+        }
+        gameViewElements = FindObjectsOfType<GameViewElement>().ToList();
+        ChangeColorScheme(false);
     }
 
-    private Coroutine menuCoroutine;
-    private void OpenMenu()
+    private void ChangeColorScheme(bool flag)
+    {
+        if (flag)
+        {
+            if (colorScheme == ColorScheme.LIGHT)
+            {
+                colorScheme = ColorScheme.DARK;
+            }
+            else
+            {
+                colorScheme = ColorScheme.LIGHT;
+            }
+        }
+        foreach (var cell in GameplayController.Instance.LevelCells)
+        {
+            if (!cell.IsEnabled)
+            {
+                cell.ChangeColor(colorScheme);
+            }
+        }
+        lastSavedColorScheme = colorScheme;
+        PlayerPrefs.SetInt("COLOR_SCHEME", (int)colorScheme);
+        CancelMenuHide();
+    }
+
+    public void ShowMenuPanel()
     {
         menuButton.gameObject.SetActive(false);
         if (menuCoroutine != null)
@@ -83,12 +141,13 @@ public class GameViewController : MonoBehaviour
         CancelMenuHide();
     }
 
-    private void SetIap()
+    private void OnIapButtonClick()
     {
         CancelMenuHide();
+        //to do
     }
 
-    private void SetSfx(bool save)
+    private void OnSfxButtonClick(bool save)
     {
         if (save)
         {
@@ -110,7 +169,7 @@ public class GameViewController : MonoBehaviour
         CancelMenuHide();
     }
 
-    private void SetSound(bool save)
+    private void OnSoundButtonClick(bool save)
     {
         if (save)
         {

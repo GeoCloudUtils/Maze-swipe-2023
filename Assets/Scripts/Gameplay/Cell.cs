@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 
-public class Cell : MonoBehaviour
+public class Cell : MonoBehaviour, IGameViewElement
 {
     [SerializeField] private Image image;
 
@@ -20,6 +20,9 @@ public class Cell : MonoBehaviour
     [SerializeField] private bool isEnd = false;
     [SerializeField] private bool hasCollectable = false;
 
+    [SerializeField] private Color colorOnLightScheme;
+    [SerializeField] private Color colorOnDarkScheme;
+
     [SerializeField] private RectTransform rect;
 
     public Vector2Int Position { get => position; set => position = value; }
@@ -34,6 +37,7 @@ public class Cell : MonoBehaviour
     public Player Player { get => player; private set => player = value; }
 
     public event Action OnCellEnabled;
+
 
     public void Init(bool isActve, bool isStartPoint, bool isEndEndPoint, bool hasCollectable = false)
     {
@@ -92,5 +96,17 @@ public class Cell : MonoBehaviour
         {
             Gizmos.DrawWireCube(transform.position, new Vector3(0.1f, 0.1f, 1f));
         }
+    }
+
+    public void Activate(ColorScheme colorScheme)
+    {
+        ChangeColor(colorScheme);
+    }
+
+    public void ChangeColor(ColorScheme colorScheme, float transitionSpeed = 0)
+    {
+        Color c = colorScheme == ColorScheme.LIGHT ? colorOnLightScheme : colorOnDarkScheme;
+        image.DOKill();
+        image.DOColor(c, 0.5f);
     }
 }

@@ -1,6 +1,8 @@
 using DG.Tweening;
 using GooglePlayGames;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -14,9 +16,13 @@ public class GameplayController : MonoBehaviour
 
     public int ActivableCellsCount { get => activableCellsCount; private set => activableCellsCount = value; }
 
+    public List<Cell> LevelCells => levelCells;
+
+    public bool SpawnComplete { get => spawnComplete;private set => spawnComplete = value; }
+
     [SerializeField] private GameObject rewardAdPanel;
 
-   
+    [SerializeField] private GameViewController gameViewController;
 
     [SerializeField] private InterstitialAdButton reloadButton;
 
@@ -52,11 +58,15 @@ public class GameplayController : MonoBehaviour
 
     private readonly List<string> achievementsList = new List<string>();
 
+    private List<Cell> levelCells = new List<Cell>();
+
     private int totalMoves = 0;
 
     private int reloadCount = 0;
 
     private Player player;
+
+    private bool spawnComplete = false;
 
     private void Awake()
     {
@@ -171,10 +181,12 @@ public class GameplayController : MonoBehaviour
         this.player = player;
         this.player.MoveComplete += OnPlayerMoveCompleted;
         this.player.Init();
+        levelCells = cells.ToList();
         foreach (var cell in cells)
         {
             cell.OnCellEnabled += CellEnabled;
         }
+        SpawnComplete = true;
     }
 
     private void CellEnabled()
@@ -290,6 +302,7 @@ public class GameplayController : MonoBehaviour
                 RotatePanel(90f);
                 break;
             case InputManager.Direction.Up:
+                gameViewController.ShowMenuPanel();
                 break;
             default:
                 break;

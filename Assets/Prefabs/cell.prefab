@@ -61,7 +61,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.11764706, g: 0.25490198, b: 0.2901961, a: 1}
+  m_Color: {r: 0.11764707, g: 0.25490198, b: 0.2901961, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -101,6 +101,8 @@ MonoBehaviour:
   isStart: 0
   isEnd: 0
   hasCollectable: 0
+  colorOnLightScheme: {r: 0.11764707, g: 0.25490198, b: 0.2901961, a: 1}
+  colorOnDarkScheme: {r: 0.30980393, g: 0.70980394, b: 0.8117648, a: 1}
   rect: {fileID: 3272976438835944825}
   enableCheck: 0
 --- !u!65 &3272976438835944829
