@@ -209,7 +209,7 @@ public class GameplayController : MonoBehaviour
         if (reachFinish)
         {
             Debug.Log("END LEVEL!");
-            SoundController.Instance.Play(SoundController.SoundType.WIN);
+            SoundController.Instance.PlaySfx(SoundController.SoundType.WIN);
 #if UNITY_EDITOR
             int defMoves = levelDefinition.AllLevels[mazeIndex - 1].maxMoves;
             if (defMoves > 0)
@@ -260,7 +260,7 @@ public class GameplayController : MonoBehaviour
                 if (movesLeft <= 0)
                 {
                     Debug.Log("LEVEL FAIL!");
-                    SoundController.Instance.Play(SoundController.SoundType.LOST);
+                    SoundController.Instance.PlaySfx(SoundController.SoundType.LOST);
                     rewardAdPanel.SetActive(true);
                     canSwipe = false;
                 }
@@ -311,7 +311,7 @@ public class GameplayController : MonoBehaviour
 
     private void RotatePanel(float angle)
     {
-        SoundController.Instance.Play(SoundController.SoundType.SWIPE);
+        SoundController.Instance.PlaySfx(SoundController.SoundType.SWIPE);
         canSwipe = false;
         Vector3 currentRotation = spawnContainer.eulerAngles;
         Vector3 newRotation = new Vector3(currentRotation.x, currentRotation.y, Mathf.RoundToInt(currentRotation.z + angle));

@@ -562,6 +562,7 @@ GameObject:
   - component: {fileID: 263887267}
   - component: {fileID: 263887266}
   - component: {fileID: 263887265}
+  - component: {fileID: 263887268}
   m_Layer: 5
   m_Name: leaderboard
   m_TagString: Untagged
@@ -670,6 +671,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 263887263}
   m_CullTransparentMesh: 1
+--- !u!114 &263887268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 263887263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 240d36f5acab95247aba762f91256c56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  image: {fileID: 263887266}
+  isElementActive: 1
+  darkSchemeColor: {r: 0.1137255, g: 0.24705884, b: 0.2784314, a: 1}
+  lightSchemeColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &275649850
 GameObject:
   m_ObjectHideFlags: 0
@@ -1066,6 +1083,7 @@ GameObject:
   - component: {fileID: 579386737}
   - component: {fileID: 579386738}
   - component: {fileID: 579386736}
+  - component: {fileID: 579386739}
   m_Layer: 5
   m_Name: gameArea
   m_TagString: Untagged
@@ -1145,6 +1163,22 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &579386739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 579386734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 240d36f5acab95247aba762f91256c56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  image: {fileID: 579386738}
+  isElementActive: 1
+  darkSchemeColor: {r: 0.11764706, g: 0.25490198, b: 0.2901961, a: 1}
+  lightSchemeColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &718471650
 GameObject:
   m_ObjectHideFlags: 0
@@ -1278,6 +1312,7 @@ GameObject:
   - component: {fileID: 796449700}
   - component: {fileID: 796449699}
   - component: {fileID: 796449698}
+  - component: {fileID: 796449701}
   m_Layer: 5
   m_Name: audio
   m_TagString: Untagged
@@ -1386,6 +1421,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 796449696}
   m_CullTransparentMesh: 1
+--- !u!114 &796449701
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 796449696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 240d36f5acab95247aba762f91256c56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  image: {fileID: 796449699}
+  isElementActive: 1
+  darkSchemeColor: {r: 0.1137255, g: 0.24705884, b: 0.2784314, a: 1}
+  lightSchemeColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &807524982
 GameObject:
   m_ObjectHideFlags: 0
@@ -1520,6 +1571,7 @@ GameObject:
   - component: {fileID: 904473767}
   - component: {fileID: 904473766}
   - component: {fileID: 904473765}
+  - component: {fileID: 904473768}
   m_Layer: 5
   m_Name: sfx
   m_TagString: Untagged
@@ -1628,6 +1680,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 904473763}
   m_CullTransparentMesh: 1
+--- !u!114 &904473768
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 904473763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 240d36f5acab95247aba762f91256c56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  image: {fileID: 904473766}
+  isElementActive: 1
+  darkSchemeColor: {r: 0.11764707, g: 0.25490198, b: 0.2901961, a: 1}
+  lightSchemeColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &953665177
 GameObject:
   m_ObjectHideFlags: 0
@@ -2310,6 +2378,7 @@ GameObject:
   - component: {fileID: 1239515521}
   - component: {fileID: 1239515522}
   - component: {fileID: 1239515525}
+  - component: {fileID: 1239515527}
   m_Layer: 5
   m_Name: rightMenu
   m_TagString: Untagged
@@ -2540,6 +2609,22 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &1239515527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1239515519}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 240d36f5acab95247aba762f91256c56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  image: {fileID: 1239515526}
+  isElementActive: 1
+  darkSchemeColor: {r: 0.2509804, g: 0.65882355, b: 0.7647059, a: 1}
+  lightSchemeColor: {r: 0.11764707, g: 0.25490198, b: 0.2901961, a: 1}
 --- !u!1 &1346889918
 GameObject:
   m_ObjectHideFlags: 0
@@ -2747,6 +2832,7 @@ GameObject:
   - component: {fileID: 1392305157}
   - component: {fileID: 1392305156}
   - component: {fileID: 1392305155}
+  - component: {fileID: 1392305158}
   m_Layer: 5
   m_Name: achievements
   m_TagString: Untagged
@@ -2855,6 +2941,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1392305153}
   m_CullTransparentMesh: 1
+--- !u!114 &1392305158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1392305153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 240d36f5acab95247aba762f91256c56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  image: {fileID: 1392305156}
+  isElementActive: 1
+  darkSchemeColor: {r: 0.1137255, g: 0.24705884, b: 0.2784314, a: 1}
+  lightSchemeColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1401278682
 GameObject:
   m_ObjectHideFlags: 0
@@ -2868,6 +2970,7 @@ GameObject:
   - component: {fileID: 1401278686}
   - component: {fileID: 1401278685}
   - component: {fileID: 1401278684}
+  - component: {fileID: 1401278688}
   m_Layer: 5
   m_Name: spawnContainer
   m_TagString: Untagged
@@ -2970,6 +3073,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1401278682}
   m_CullTransparentMesh: 1
+--- !u!114 &1401278688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1401278682}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 240d36f5acab95247aba762f91256c56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  image: {fileID: 1401278686}
+  isElementActive: 1
+  darkSchemeColor: {r: 0.11764707, g: 0.25490198, b: 0.2901961, a: 1}
+  lightSchemeColor: {r: 0.2509804, g: 0.65882355, b: 0.7647059, a: 1}
 --- !u!1 &1452813209
 GameObject:
   m_ObjectHideFlags: 0
@@ -3116,12 +3235,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e7815c311eaf78c41b6d3c3e0b2f7c26, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  savedData:
+  currentData:
     settings:
       sfx: 0
       sound: 0
     score: 0
     level: 0
+    colorScheme: 0
 --- !u!4 &1480788516
 Transform:
   m_ObjectHideFlags: 0
@@ -3548,6 +3668,7 @@ GameObject:
   - component: {fileID: 1629817324}
   - component: {fileID: 1629817323}
   - component: {fileID: 1629817322}
+  - component: {fileID: 1629817325}
   m_Layer: 5
   m_Name: colorSchemeChangeButton
   m_TagString: Untagged
@@ -3656,6 +3777,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1629817320}
   m_CullTransparentMesh: 1
+--- !u!114 &1629817325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1629817320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 240d36f5acab95247aba762f91256c56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  image: {fileID: 1629817323}
+  isElementActive: 1
+  darkSchemeColor: {r: 0.1137255, g: 0.24705884, b: 0.2784314, a: 1}
+  lightSchemeColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1795580070
 GameObject:
   m_ObjectHideFlags: 0
@@ -3718,24 +3855,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 602c8a48f996b6f49a594e7f72090f24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  colorOnLightScheme: {r: 1, g: 1, b: 1, a: 1}
-  colorOnDarkScheme: {r: 0.11764706, g: 0.25490198, b: 0.2901961, a: 1}
   menu: {fileID: 1239515519}
   menuButton: {fileID: 1346889920}
   sfxImage: {fileID: 904473766}
   musicImage: {fileID: 796449699}
+  colorSchemeImage: {fileID: 1629817323}
   sfxInactiveSprite: {fileID: 21300000, guid: 3a547b28ba2934e729b159862416218a, type: 3}
   sfxActiveSprite: {fileID: 21300000, guid: 680beecd0e12f44a0be9ac04460943bb, type: 3}
   musicInactiveSprite: {fileID: 21300000, guid: 1930e2e8b14a645ebb4255b40ef522f2, type: 3}
   musicActiveSprite: {fileID: 21300000, guid: 96792db56933a49a0987032e7f67cb70, type: 3}
+  colorSchemeDarkSprite: {fileID: 21300000, guid: e43c9e15a19e54f87ab280e4cf3aceb6, type: 3}
+  colorSchemeLightSprite: {fileID: 21300000, guid: 30a351db7ea5742f2b3c2cce3ac0abf5, type: 3}
   soundButton: {fileID: 796449698}
   sfxButton: {fileID: 904473765}
   iapButton: {fileID: 1975673735}
   leaderboardButton: {fileID: 263887265}
   achievementsButton: {fileID: 1392305155}
   colorSchemeChangeButton: {fileID: 1629817322}
-  hideDelay: 5
-  colorScheme: 0
+  menuHideDelay: 5
+  colorSwitchSpeed: 0.5
 --- !u!1 &1863327725
 GameObject:
   m_ObjectHideFlags: 0
@@ -3958,6 +4096,7 @@ GameObject:
   - component: {fileID: 1975673737}
   - component: {fileID: 1975673736}
   - component: {fileID: 1975673735}
+  - component: {fileID: 1975673738}
   m_Layer: 5
   m_Name: noAds
   m_TagString: Untagged
@@ -4066,6 +4205,22 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1975673733}
   m_CullTransparentMesh: 1
+--- !u!114 &1975673738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1975673733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 240d36f5acab95247aba762f91256c56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  image: {fileID: 1975673736}
+  isElementActive: 1
+  darkSchemeColor: {r: 0.1137255, g: 0.24705884, b: 0.2784314, a: 1}
+  lightSchemeColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &2132495370
 GameObject:
   m_ObjectHideFlags: 0

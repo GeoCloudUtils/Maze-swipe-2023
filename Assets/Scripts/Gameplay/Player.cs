@@ -34,7 +34,7 @@ public class Player : MonoBehaviour
         {
             Cell playerCell = CurrentCell;
             Cell belowCell = GetBellow(playerCell);
-            if (belowCell == null || belowCell.IsEnabled)
+            if (belowCell == null || belowCell.isElementActive)
             {
                 canMove = false;
             }

@@ -3,10 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 
-public class Cell : MonoBehaviour, IGameViewElement
+public class Cell : GameViewElement
 {
-    [SerializeField] private Image image;
-
     [SerializeField] private Button button;
 
     [SerializeField] private Player player;
@@ -15,19 +13,14 @@ public class Cell : MonoBehaviour, IGameViewElement
 
     [SerializeField] private Vector2Int position;
 
-    [SerializeField] private bool isEnabled = true;
     [SerializeField] private bool isStart = false;
     [SerializeField] private bool isEnd = false;
     [SerializeField] private bool hasCollectable = false;
-
-    [SerializeField] private Color colorOnLightScheme;
-    [SerializeField] private Color colorOnDarkScheme;
 
     [SerializeField] private RectTransform rect;
 
     public Vector2Int Position { get => position; set => position = value; }
     public Image Image { get => image; set => image = value; }
-    public bool IsEnabled { get => isEnabled; private set => isEnabled = value; }
     public bool IsStart { get => isStart; private set => isStart = value; }
     public bool IsEnd { get => isEnd; private set => isEnd = value; }
 
@@ -42,11 +35,12 @@ public class Cell : MonoBehaviour, IGameViewElement
     public void Init(bool isActve, bool isStartPoint, bool isEndEndPoint, bool hasCollectable = false)
     {
         SetState(isActve ? 1f : 0.1f);
-        IsEnabled = isActve;
+        this.isElementActive = isActve;
         this.IsStart = isStartPoint;
         this.IsEnd = isEndEndPoint;
         this.HasCollectable = hasCollectable;
         button.onClick.AddListener(OnCellClick);
+        GameViewController.Instance.OnColorSchemeChange += ChangeColor;
     }
 
     private void SetState(float state)
@@ -58,13 +52,13 @@ public class Cell : MonoBehaviour, IGameViewElement
 
     private void OnCellClick()
     {
-        if (IsEnabled || IsNotEmpty() || hasCollectable || isEnd)
+        if (isElementActive || IsNotEmpty() || hasCollectable || isEnd)
         {
             return;
         }
         if (GameplayController.Instance.ActivableCellsCount > 0)
         {
-            IsEnabled = true;
+            isElementActive = true;
             SetState(1);
             OnCellEnabled?.Invoke();
             Image.transform.DOScale(1f, 0.25f).From(1.1f).SetEase(Ease.OutBack);
@@ -96,17 +90,5 @@ public class Cell : MonoBehaviour, IGameViewElement
         {
             Gizmos.DrawWireCube(transform.position, new Vector3(0.1f, 0.1f, 1f));
         }
-    }
-
-    public void Activate(ColorScheme colorScheme)
-    {
-        ChangeColor(colorScheme);
-    }
-
-    public void ChangeColor(ColorScheme colorScheme, float transitionSpeed = 0)
-    {
-        Color c = colorScheme == ColorScheme.LIGHT ? colorOnLightScheme : colorOnDarkScheme;
-        image.DOKill();
-        image.DOColor(c, 0.5f);
     }
 }

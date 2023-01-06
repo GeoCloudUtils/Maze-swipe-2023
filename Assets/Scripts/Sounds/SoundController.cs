@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SoundController : MonoBehaviour
+public class SoundController : Singleton<SoundController>
 {
     public AudioClip bgMusic;
     public AudioClip swipeEffect;
@@ -14,8 +14,6 @@ public class SoundController : MonoBehaviour
     public float LowPitchRange = .95f;
     public float HighPitchRange = 1.05f;
 
-    public static SoundController Instance = null;
-
     public enum SoundType
     {
         BG,
@@ -25,23 +23,13 @@ public class SoundController : MonoBehaviour
         WIN
     }
 
-    private void Awake()
+    /// <summary>
+    /// Callback for playing an sound effect based on enum value if sfx is active in settings
+    /// </summary>
+    /// <param name="soundType"></param>
+    public void PlaySfx(SoundType soundType)
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else if (Instance != this)
-        {
-            Destroy(gameObject);
-        }
-        DontDestroyOnLoad(gameObject);
-        PlayMusic();
-    }
-
-    public void Play(SoundType soundType)
-    {
-        if (PlayerPrefs.GetInt("SFX") == 1)
+        if (DataManager.Instance.Settings.sfx == true)
         {
             switch (soundType)
             {
@@ -62,24 +50,35 @@ public class SoundController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Callback for start or stop playing background music if sound is active in settings
+    /// </summary>
     public void PlayMusic()
     {
-        if (!PlayerPrefs.HasKey("MUSIC"))
-        {
-            PlayerPrefs.SetInt("MUSIC", 1);
-        }
-        if (PlayerPrefs.GetInt("MUSIC") == 1)
+        if (DataManager.Instance.Settings.sound == true)
         {
             MusicSource.clip = bgMusic;
             MusicSource.loop = true;
             MusicSource.Play();
         }
+        else
+        {
+            StopMusic();
+        }
     }
+
+    /// <summary>
+    /// Callback for stop playing background music
+    /// </summary>
     public void StopMusic()
     {
         MusicSource.Stop();
     }
 
+    /// <summary>
+    /// Callback for playing random sound effect
+    /// </summary>
+    /// <param name="clips"></param>
     public void RandomSoundEffect(params AudioClip[] clips)
     {
         int randomIndex = Random.Range(0, clips.Length);
