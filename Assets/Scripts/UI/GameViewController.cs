@@ -11,6 +11,8 @@ public enum ColorScheme
 public class GameViewController : Singleton<GameViewController>
 {
     [Header("General references")]
+    [SerializeField] private GameObject _root;
+
     [SerializeField] private GameObject menu;
 
     [SerializeField] private Button menuButton;
@@ -43,6 +45,16 @@ public class GameViewController : Singleton<GameViewController>
     private Coroutine menuCoroutine;
 
     public event Action<ColorScheme, float> OnColorSchemeChange;
+
+    public void Show()
+    {
+        _root.SetActive(true);
+    }
+
+    public void Hide()
+    {
+        _root.SetActive(false);
+    }
 
     private IEnumerator Start()
     {

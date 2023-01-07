@@ -52,7 +52,7 @@ public class DataManager : Singleton<DataManager>
     /// <param name="settings"></param>
     /// <param name="level"></param>
     /// <param name="score"></param>
-    public void Save(ColorScheme colorScheme = ColorScheme.LIGHT, Settings settings = null, int level = -1, int score = -1)
+    public void Save(ColorScheme colorScheme = ColorScheme.LIGHT, Settings settings = null, int level = -1, int score = -1, int diamonds = -1)
     {
         string filePath = $"{Application.persistentDataPath}/{SystemInfo.deviceUniqueIdentifier}";
 
@@ -75,6 +75,8 @@ public class DataManager : Singleton<DataManager>
         /// if score is not defined or is less than 0, load last saved score
         if (score < 0) { score = currentData.score; }
 
+        if (diamonds < 0) { diamonds = currentData.diamonds; }
+
         Settings newSettings = new Settings
         {
             sfx = settings.sfx,
@@ -85,7 +87,8 @@ public class DataManager : Singleton<DataManager>
             settings = newSettings,
             score = score,
             level = level,
-            colorScheme = colorScheme
+            colorScheme = colorScheme,
+            diamonds = diamonds
         };
         string key = DataEncryptoDecryptor.LoadSecretKey();
         DataEncryptoDecryptor.SaveEncryptedFile(data, filePath, key);
@@ -127,6 +130,7 @@ public class SavedGameData
 
     public int score;
     public int level;
+    public int diamonds;
 
     public ColorScheme colorScheme;
 }

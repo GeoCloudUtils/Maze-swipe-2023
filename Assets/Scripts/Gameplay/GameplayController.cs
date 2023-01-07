@@ -1,13 +1,12 @@
 using DG.Tweening;
 using GooglePlayGames;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.SocialPlatforms;
-using UnityEngine.UI;
 
 public class GameplayController : MonoBehaviour
 {
@@ -18,15 +17,15 @@ public class GameplayController : MonoBehaviour
 
     public List<Cell> LevelCells => levelCells;
 
-    public bool SpawnComplete { get => spawnComplete;private set => spawnComplete = value; }
+    public bool SpawnComplete { get => spawnComplete; private set => spawnComplete = value; }
 
     [SerializeField] private GameObject rewardAdPanel;
+
+    [SerializeField] private UIFinishScreen finishScreen;
 
     [SerializeField] private GameViewController gameViewController;
 
     [SerializeField] private InterstitialAdButton reloadButton;
-
-    [SerializeField] private Button debugReset;
 
     [SerializeField] private TMP_Text levelText;
     [SerializeField] private TMP_Text movesText;
@@ -44,9 +43,6 @@ public class GameplayController : MonoBehaviour
 
     [SerializeField] private bool canSwipe = false;
 
-    [Header("Testing")]
-    public bool testMode = false;
-
     [SerializeField] private int mazeIndex = 0;
     [SerializeField] private int collectablesCount = 0;
     [SerializeField] private int activableCellsCount = 0;
@@ -60,13 +56,19 @@ public class GameplayController : MonoBehaviour
 
     private List<Cell> levelCells = new List<Cell>();
 
-    private int totalMoves = 0;
-
     private int reloadCount = 0;
 
     private Player player;
 
     private bool spawnComplete = false;
+
+    private bool levelComplete = false;
+
+    private int currentLevelIndex;
+    private int score;
+    private int diamonds;
+    private int totalMoves = 0;
+    private int rewardCount;
 
     private void Awake()
     {
@@ -100,26 +102,17 @@ public class GameplayController : MonoBehaviour
         achievementsList.Add(GPGSIds.achievement_master);
 
         reloadButton.OnInterstitialAdButtonClick += DoReload;
-        debugReset.onClick.AddListener(DoReset);
-        if (!testMode)
-        {
-            if (!PlayerPrefs.HasKey("MAZE_INDEX"))
-            {
-                PlayerPrefs.SetInt("MAZE_INDEX", 0);
-            }
-            mazeIndex = PlayerPrefs.GetInt("MAZE_INDEX");
-        }
+
         RunNextLevel();
+
         reloadCount = PlayerPrefs.GetInt("ReloadCount");
+        finishScreen.OnNext += RunNextLevel;
     }
 
-    ///debug
-    private void DoReset()
-    {
-        PlayerPrefs.DeleteAll();
-        DoReload();
-    }
-
+    /// <summary>
+    /// Reload callback but saving reload count
+    /// Used to show interstitial ads
+    /// </summary>
     private void DoReload()
     {
         reloadCount++;
@@ -134,25 +127,34 @@ public class GameplayController : MonoBehaviour
         Reload();
     }
 
+    /// <summary>
+    /// Reload current level
+    /// </summary>
     public void Reload()
     {
         SceneManager.LoadScene(0);
     }
 
+    /// <summary>
+    /// Run next level
+    /// </summary>
     private void RunNextLevel()
     {
+        finishScreen.Hide();
+        gameViewController.Show();
+        inputManager.gameObject.SetActive(true);
+
         if (mazeIndex > levelDefinition.AllLevels.Count - 1)
         {
             Debug.LogWarning("NO MORE LEVELS!");
+            //to do
             return;
         }
         mazeData = levelDefinition.AllLevels[mazeIndex];
         movesLeft = mazeData.maxMoves + 1;
 
-        Debug.Log("Level data: " + mazeData.levelData);
         spawner.Init(mazeData);
         mazeIndex++;
-        moves = 0;
 
         if (activableCellsList.Count > 0)
         {
@@ -172,9 +174,15 @@ public class GameplayController : MonoBehaviour
         activableCellsCount = mazeData.activableCellsCount;
         levelText.SetText($"Level {mazeIndex}");
         totalMoves = 0;
-        LevelTimer.Instance.SetTimerRunning(true);
+        levelComplete = false;
     }
 
+    /// <summary>
+    /// Level spawn complete callback
+    /// Activate all cells events
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="cells"></param>
     private void OnSpawnComplete(Player player, Cell[] cells)
     {
         inputManager.OnSwipe += OnSwipe;
@@ -189,6 +197,10 @@ public class GameplayController : MonoBehaviour
         SpawnComplete = true;
     }
 
+    /// <summary>
+    /// Callback on maze cell enabled
+    /// Remove activable cells if exist
+    /// </summary>
     private void CellEnabled()
     {
         activableCellsCount--;
@@ -198,8 +210,14 @@ public class GameplayController : MonoBehaviour
         });
     }
 
+    /// <summary>
+    /// Callback on player move complete
+    /// Check's if player reach the end 
+    /// </summary>
+    /// <param name="reachFinish"></param>
     private void OnPlayerMoveCompleted(bool reachFinish)
     {
+        if (levelComplete) { return; }
         movesLeft--;
         if (movesLeft < 0)
         {
@@ -208,26 +226,30 @@ public class GameplayController : MonoBehaviour
         movesText.SetText(movesLeft.ToString());
         if (reachFinish)
         {
+            levelComplete = true;
             Debug.Log("END LEVEL!");
             SoundController.Instance.PlaySfx(SoundController.SoundType.WIN);
 #if UNITY_EDITOR
             int defMoves = levelDefinition.AllLevels[mazeIndex - 1].maxMoves;
             if (defMoves > 0)
             {
-                if (defMoves > moves)
+                if (defMoves > totalMoves)
                 {
-                    levelDefinition.AllLevels[mazeIndex - 1].maxMoves = moves;
+                    levelDefinition.AllLevels[mazeIndex - 1].maxMoves = totalMoves;
                 }
             }
             else
             {
-                levelDefinition.AllLevels[mazeIndex - 1].maxMoves = moves;
+                levelDefinition.AllLevels[mazeIndex - 1].maxMoves = totalMoves;
             }
 #endif
             foreach (var achievement in achievementsList)
             {
                 IncrementAchievement(achievement);
             }
+
+            ///to remove
+            ///not in use
             Social.LoadScores(GPGSIds.leaderboard_players, scores =>
             {
                 if (scores.Length > 0)
@@ -243,63 +265,98 @@ public class GameplayController : MonoBehaviour
                 else
                     Debug.Log("No scores loaded");
             });
-            LevelTimer.Instance.SetTimerRunning(false);
-            int score = LevelTimer.Instance.GetPoints();
-            Social.ReportScore(score * 100, GPGSIds.leaderboard_players, (succes) =>
-            {
+            ///------------------
+            ///
 
-            });
-            PlayerPrefs.SetInt("MAZE_INDEX", mazeIndex);
-            Invoke(nameof(RunNextLevel), 1.0f);
+            StartCoroutine(OnFinishCoroutine());
             return;
         }
         else
         {
-            if (!testMode)
+            if (movesLeft <= 0)
             {
-                if (movesLeft <= 0)
-                {
-                    Debug.Log("LEVEL FAIL!");
-                    SoundController.Instance.PlaySfx(SoundController.SoundType.LOST);
-                    rewardAdPanel.SetActive(true);
-                    canSwipe = false;
-                }
+                SoundController.Instance.PlaySfx(SoundController.SoundType.LOST);
+                rewardAdPanel.SetActive(true);
+                canSwipe = false;
+                return;
             }
         }
         canSwipe = true;
     }
 
+
+    /// <summary>
+    /// Coroutine on level complete
+    /// Show's finish screen and calculate results
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator OnFinishCoroutine()
+    {
+        yield return new WaitForSeconds(1f);
+        inputManager.gameObject.SetActive(false);
+        gameViewController.Hide();
+        finishScreen.Show(GetLevelResults());
+        Social.ReportScore(score, GPGSIds.leaderboard_players, (succes) =>
+        {
+            //need to do something? =/
+        });
+    }
+
+    /// <summary>
+    /// Calculate level results
+    /// </summary>
+    /// <returns></returns>
+    private LevelResults GetLevelResults()
+    {
+        currentLevelIndex = mazeIndex;
+        score = 100; // need formula
+        diamonds = UnityEngine.Random.Range(1, 4);// get 1 , 2 or 3 diamonds per level
+        rewardCount = UnityEngine.Random.Range(2, 4);// get 2x or 3x more diamonds 
+
+        return new LevelResults
+        {
+            level = currentLevelIndex,
+            score = score,
+            diamonds = diamonds,
+            moves = totalMoves,
+            reward = rewardCount
+        };
+    }
+
+    /// <summary>
+    /// Callback for increasing achievements by name
+    /// </summary>
+    /// <param name="achievement"></param>
     private void IncrementAchievement(string achievement)
     {
         PlayGamesPlatform platform = (PlayGamesPlatform)Social.Active;
         platform.IncrementAchievement(achievement, 1, (bool succes) =>
         {
-
+            //need to do something? =/
         });
     }
 
-    int moves = 0;
+    /// <summary>
+    /// Callback on maze swipe
+    /// Check's direction and rotate maze by angle
+    /// </summary>
+    /// <param name="swipeDirection"></param>
     private void OnSwipe(InputManager.Direction swipeDirection)
     {
-        if (!canSwipe)
+        if (!canSwipe) { return; }
+
+        if (movesLeft <= 0)
         {
+            rewardAdPanel.SetActive(true);
             return;
-        }
-        if (!testMode)
-        {
-            if (movesLeft <= 0)
-            {
-                rewardAdPanel.SetActive(true);
-                return;
-            }
         }
         switch (swipeDirection)
         {
             case InputManager.Direction.Left:
-                RotatePanel(-90f);
+                RotateMaze(-90f);
                 break;
             case InputManager.Direction.Right:
-                RotatePanel(90f);
+                RotateMaze(90f);
                 break;
             case InputManager.Direction.Up:
                 gameViewController.ShowMenuPanel();
@@ -309,7 +366,12 @@ public class GameplayController : MonoBehaviour
         }
     }
 
-    private void RotatePanel(float angle)
+    /// <summary>
+    /// Main maze rotate function
+    /// Rotate maze using smooth tween
+    /// </summary>
+    /// <param name="angle"></param>
+    private void RotateMaze(float angle)
     {
         SoundController.Instance.PlaySfx(SoundController.SoundType.SWIPE);
         canSwipe = false;
@@ -318,7 +380,7 @@ public class GameplayController : MonoBehaviour
         spawnContainer.DORotate(newRotation, .5f).SetEase(Ease.OutExpo).OnComplete(() =>
         {
             player.Init();
+            totalMoves++;
         });
-        moves++;
     }
 }
