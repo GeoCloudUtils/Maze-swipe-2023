@@ -2,6 +2,10 @@ using UnityEngine;
 using GooglePlayGames;
 using GooglePlayGames.BasicApi;
 
+/// <summary>
+/// GPGS Controller
+/// Used for LogIn into google play game services
+/// </summary>
 public class GPGS_Controller : MonoBehaviour
 {
     public PlayGamesClientConfiguration clientConfiguration;
@@ -12,11 +16,19 @@ public class GPGS_Controller : MonoBehaviour
         SignIntoGPGS(SignInInteractivity.CanPromptAlways, clientConfiguration);
     }
 
+    /// <summary>
+    /// Client configuration callback
+    /// </summary>
     internal void Configure()
     {
         clientConfiguration = new PlayGamesClientConfiguration.Builder().Build();
     }
 
+    /// <summary>
+    /// Sign In callback into GPGS
+    /// </summary>
+    /// <param name="interactivity"></param>
+    /// <param name="configuration"></param>
     internal void SignIntoGPGS(SignInInteractivity interactivity, PlayGamesClientConfiguration configuration)
     {
         configuration = clientConfiguration;

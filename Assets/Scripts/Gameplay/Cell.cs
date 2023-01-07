@@ -3,10 +3,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 
-public class Cell : MonoBehaviour
+public class Cell : GameViewElement
 {
-    [SerializeField] private Image image;
-
     [SerializeField] private Button button;
 
     [SerializeField] private Player player;
@@ -15,7 +13,6 @@ public class Cell : MonoBehaviour
 
     [SerializeField] private Vector2Int position;
 
-    [SerializeField] private bool isEnabled = true;
     [SerializeField] private bool isStart = false;
     [SerializeField] private bool isEnd = false;
     [SerializeField] private bool hasCollectable = false;
@@ -24,7 +21,6 @@ public class Cell : MonoBehaviour
 
     public Vector2Int Position { get => position; set => position = value; }
     public Image Image { get => image; set => image = value; }
-    public bool IsEnabled { get => isEnabled; private set => isEnabled = value; }
     public bool IsStart { get => isStart; private set => isStart = value; }
     public bool IsEnd { get => isEnd; private set => isEnd = value; }
 
@@ -35,14 +31,16 @@ public class Cell : MonoBehaviour
 
     public event Action OnCellEnabled;
 
+
     public void Init(bool isActve, bool isStartPoint, bool isEndEndPoint, bool hasCollectable = false)
     {
         SetState(isActve ? 1f : 0.1f);
-        IsEnabled = isActve;
+        this.isElementActive = isActve;
         this.IsStart = isStartPoint;
         this.IsEnd = isEndEndPoint;
         this.HasCollectable = hasCollectable;
         button.onClick.AddListener(OnCellClick);
+        GameViewController.Instance.OnColorSchemeChange += ChangeColor;
     }
 
     private void SetState(float state)
@@ -54,13 +52,13 @@ public class Cell : MonoBehaviour
 
     private void OnCellClick()
     {
-        if (IsEnabled || IsNotEmpty() || hasCollectable || isEnd)
+        if (isElementActive || IsNotEmpty() || hasCollectable || isEnd)
         {
             return;
         }
         if (GameplayController.Instance.ActivableCellsCount > 0)
         {
-            IsEnabled = true;
+            isElementActive = true;
             SetState(1);
             OnCellEnabled?.Invoke();
             Image.transform.DOScale(1f, 0.25f).From(1.1f).SetEase(Ease.OutBack);

@@ -4,6 +4,9 @@ using UnityEngine;
 using DG.Tweening;
 using System;
 
+/// <summary>
+/// Player logic
+/// </summary>
 public class Player : MonoBehaviour
 {
     public Cell CurrentCell;
@@ -18,11 +21,20 @@ public class Player : MonoBehaviour
     public event Action<bool> MoveComplete;
 
     private bool captureEvents = true;
+
+    /// <summary>
+    /// Start player check's
+    /// </summary>
     public void Init()
     {
         StartCoroutine(MovePlayer());
     }
 
+    /// <summary>
+    /// Move player through grid
+    /// Check's for end
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator MovePlayer()
     {
         if (!captureEvents)
@@ -34,7 +46,7 @@ public class Player : MonoBehaviour
         {
             Cell playerCell = CurrentCell;
             Cell belowCell = GetBellow(playerCell);
-            if (belowCell == null || belowCell.IsEnabled)
+            if (belowCell == null || belowCell.isElementActive)
             {
                 canMove = false;
             }
@@ -70,6 +82,11 @@ public class Player : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Get's bellow cell
+    /// </summary>
+    /// <param name="targetCell"></param>
+    /// <returns></returns>
     private Cell GetBellow(Cell targetCell)
     {
         Vector2Int targetPosition = targetCell.Position;
@@ -80,6 +97,7 @@ public class Player : MonoBehaviour
 
     private void Update()
     {
+        //rotate cat head to be allways verticaly
         cat.transform.rotation = Quaternion.Euler(0.0f, 0.0f, gameObject.transform.parent.rotation.z * -1.0f);
     }
 }

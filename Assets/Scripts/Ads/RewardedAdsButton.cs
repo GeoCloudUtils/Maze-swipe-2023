@@ -1,16 +1,18 @@
+using System;
 using UnityEngine;
 using UnityEngine.Advertisements;
 using UnityEngine.UI;
 
 public class RewardedAdsButton : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener
 {
-    [SerializeField] Button _showAdButton;
+    public Button _showAdButton;
 
     [SerializeField] string _androidAdUnitId = "Rewarded_Android";
     [SerializeField] string _iOSAdUnitId = "Rewarded_iOS";
 
     string _adUnitId = null;
 
+    public event Action RewardAdComplete;
     void Awake()
     {
 #if UNITY_IOS
@@ -46,8 +48,8 @@ public class RewardedAdsButton : MonoBehaviour, IUnityAdsLoadListener, IUnityAds
     {
         if (adUnitId.Equals(_adUnitId) && showCompletionState.Equals(UnityAdsShowCompletionState.COMPLETED))
         {
-            GameplayController.Instance.AddMoves(3);
             _showAdButton.interactable = true;
+            RewardAdComplete?.Invoke();
             // Grant a reward.
         }
     }

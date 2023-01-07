@@ -61,7 +61,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.11764706, g: 0.25490198, b: 0.2901961, a: 1}
+  m_Color: {r: 0.11764707, g: 0.25490198, b: 0.2901961, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -91,13 +91,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   image: {fileID: 3272976438835944824}
+  isElementActive: 1
+  darkSchemeColor: {r: 0.2509804, g: 0.65882355, b: 0.7647059, a: 1}
+  lightSchemeColor: {r: 0.11764707, g: 0.25490198, b: 0.2901961, a: 1}
   button: {fileID: 8284821734210310998}
   player: {fileID: 0}
   m_LayerMask:
     serializedVersion: 2
     m_Bits: 64
   position: {x: 0, y: 0}
-  isEnabled: 1
   isStart: 0
   isEnd: 0
   hasCollectable: 0
