@@ -164,7 +164,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9ee9f1528bdc68b4c83db2d47849b9a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentCell: {fileID: 0}
-  cat: {fileID: 8052816069578585764}
-  Rect: {fileID: 6076277151946245678}
+  currentCell: {fileID: 0}
+  playerTransform: {fileID: 6076277151946245678}
+  playerIconTransform: {fileID: 8052816069578585764}
   gridCells: []
+  captureInputEvents: 1
+  isMoving: 0
+  isOnEndCell: 0
+  elapsedMoveTime: 0
+  moveDuration: 0.15

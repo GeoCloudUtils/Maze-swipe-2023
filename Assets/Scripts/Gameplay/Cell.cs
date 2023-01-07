@@ -3,6 +3,13 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 
+public enum ActionType
+{
+    DESTROY = 0,
+    ACTIVABLE_CELL_REQUEST = 1,
+    DIAMONDS_REQUEST = 2
+}
+
 public class Cell : GameViewElement
 {
     [SerializeField] private Button button;
@@ -24,12 +31,12 @@ public class Cell : GameViewElement
     public bool IsStart { get => isStart; private set => isStart = value; }
     public bool IsEnd { get => isEnd; private set => isEnd = value; }
 
-    public bool enableCheck = false;
+    public bool captureEvents = false;
     public bool HasCollectable { get; set; }
     public RectTransform Rect { get => rect; private set => rect = value; }
     public Player Player { get => player; private set => player = value; }
 
-    public event Action OnCellEnabled;
+    public event Action<ActionType, Cell> OnCellClickDelegate;
 
 
     public void Init(bool isActve, bool isStartPoint, bool isEndEndPoint, bool hasCollectable = false)
@@ -43,7 +50,7 @@ public class Cell : GameViewElement
         GameViewController.Instance.OnColorSchemeChange += ChangeColor;
     }
 
-    private void SetState(float state)
+    public void SetState(float state)
     {
         Color imgColor = Image.color;
         imgColor.a = state;
@@ -52,6 +59,23 @@ public class Cell : GameViewElement
 
     private void OnCellClick()
     {
+        if (!captureEvents) { return; }
+        if (isElementActive)
+        {
+            int diamonds = DataManager.Instance.currentData.diamonds;
+            int destroyCost = GameplayController.Instance.cellDestroyCost;
+            bool haveEnoughDiamonds = diamonds - destroyCost >= 0;
+            if (haveEnoughDiamonds)
+            {
+                isElementActive = false;
+                SetState(0.1f);
+                OnCellClickDelegate?.Invoke(ActionType.DESTROY, this);
+            }
+            else
+            {
+                OnCellClickDelegate?.Invoke(ActionType.DIAMONDS_REQUEST, this);
+            }
+        }
         if (isElementActive || IsNotEmpty() || hasCollectable || isEnd)
         {
             return;
@@ -60,7 +84,7 @@ public class Cell : GameViewElement
         {
             isElementActive = true;
             SetState(1);
-            OnCellEnabled?.Invoke();
+            OnCellClickDelegate?.Invoke(ActionType.ACTIVABLE_CELL_REQUEST, this);
             Image.transform.DOScale(1f, 0.25f).From(1.1f).SetEase(Ease.OutBack);
         }
     }
@@ -72,7 +96,7 @@ public class Cell : GameViewElement
 
     void FixedUpdate()
     {
-        if (enableCheck)
+        if (captureEvents)
         {
             Collider[] hitColliders = Physics.OverlapBox(gameObject.transform.position, new Vector3(0.1f, 0.1f, 1f), Quaternion.identity, m_LayerMask);
             if (hitColliders.Length > 0)
@@ -86,7 +110,7 @@ public class Cell : GameViewElement
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        if (enableCheck)
+        if (captureEvents)
         {
             Gizmos.DrawWireCube(transform.position, new Vector3(0.1f, 0.1f, 1f));
         }

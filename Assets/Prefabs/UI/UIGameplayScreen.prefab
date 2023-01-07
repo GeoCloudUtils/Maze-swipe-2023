@@ -308,11 +308,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6eb02317c3cdb547834ba943ac216c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rewardAdPanel: {fileID: 0}
+  rewardRequestScreen: {fileID: 0}
   finishScreen: {fileID: 0}
   gameViewController: {fileID: 0}
   reloadButton: {fileID: 0}
-  debugReset: {fileID: 0}
   levelText: {fileID: 0}
   movesText: {fileID: 0}
   activableCellPrefab: {fileID: 5146362343329382014, guid: 1a8f711c178653946b5eb30d185d250f, type: 3}
@@ -322,7 +321,6 @@ MonoBehaviour:
   inputManager: {fileID: 0}
   spawnContainer: {fileID: 3027049359253278331}
   canSwipe: 0
-  testMode: 1
   mazeIndex: 0
   collectablesCount: 0
   activableCellsCount: 0
@@ -334,3 +332,4 @@ MonoBehaviour:
     maxMoves: 0
     activableCellsCount: 0
   activableCellsList: []
+  cellDestroyCost: 2
