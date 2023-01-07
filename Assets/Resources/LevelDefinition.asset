@@ -22,7 +22,7 @@ MonoBehaviour:
   - level: Level_2 (3x3)
     levelData: 121100103
     gridLength: 3
-    maxMoves: 1
+    maxMoves: 5
     activableCellsCount: 0
   data: 000000000
   rows: 3

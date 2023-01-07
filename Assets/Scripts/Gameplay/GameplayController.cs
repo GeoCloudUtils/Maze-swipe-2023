@@ -53,7 +53,10 @@ public class GameplayController : Singleton<GameplayController>
     private int score;
     private int diamonds;
     private int totalMoves = 0;
+    [SerializeField] private int levelScore = 0;
     private readonly int diamondsRewardCount = 3;
+
+    private int levelTotalPoints = 720;
 
     private void Start()
     {
@@ -139,8 +142,10 @@ public class GameplayController : Singleton<GameplayController>
             //to do
             return;
         }
+        levelScore = levelTotalPoints;
         mazeData = levelDefinition.AllLevels[mazeIndex];
         movesLeft = mazeData.maxMoves + 1;
+        movesText.SetText(movesLeft.ToString());
 
         spawner.Init(mazeData);
         mazeIndex++;
@@ -300,9 +305,11 @@ public class GameplayController : Singleton<GameplayController>
     private LevelResults GetLevelResults()
     {
         currentLevelIndex = mazeIndex;
-        score = 100; // need formula
-        diamonds = UnityEngine.Random.Range(1, 4);// get 1 , 2 or 3 diamonds per level
 
+        int guarantedPoints = 25;
+        score = Mathf.Max(levelScore, guarantedPoints);
+
+        diamonds = UnityEngine.Random.Range(1, 4);// get 1 , 2 or 3 diamonds per level
         return new LevelResults
         {
             level = currentLevelIndex,
@@ -370,11 +377,18 @@ public class GameplayController : Singleton<GameplayController>
         canSwipe = false;
         Vector3 currentRotation = spawnContainer.eulerAngles;
         Vector3 newRotation = new Vector3(currentRotation.x, currentRotation.y, Mathf.RoundToInt(currentRotation.z + angle));
+        movesLeft--;
+        movesText.SetText(movesLeft.ToString());
         spawnContainer.DORotate(newRotation, .5f).SetEase(Ease.OutExpo).OnComplete(() =>
         {
             totalMoves++;
             canSwipe = true;
             player.captureInputEvents = true;
+            int decreasePerMove = 25;
+            if (totalMoves > mazeData.maxMoves)
+            {
+                levelScore -= decreasePerMove;
+            }
         });
     }
 
