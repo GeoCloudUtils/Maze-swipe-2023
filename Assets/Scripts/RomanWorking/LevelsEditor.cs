@@ -14,6 +14,8 @@ public class LevelData
     public int randomizerSeed;
     public int inactiveCells;
     public int gridSize;
+    public int activableCellsCount;
+    public string levelData;
 }
 
 public class Vec2
@@ -35,13 +37,14 @@ public class LevelsEditor : EditorWindow
         public int[] data;
         public int gridSize;
         public int inactiveCells;
+        public int activableCellsCount;
         public Vector2Int targetPos;
         public Vector2Int playerPos;
         internal bool[,] walkMap;
     }
 
-    [SerializeField] private EditorData _data;
-    [SerializeField] private PathInfo _pathInfo;
+    [SerializeField] private EditorData _data = new EditorData();
+    [SerializeField] private PathInfo _pathInfo = new PathInfo();
     [SerializeField] private bool _showPositions;
     [SerializeField] private int _randomizerSeed;
     [SerializeField] private int _customSeed;
@@ -79,6 +82,8 @@ public class LevelsEditor : EditorWindow
             data = new int[9] {1,1,1,1,1,1,1,1,1},
             inactiveCells = 7
         };
+        _pathInfo = new PathInfo();
+        Debug.Log("Initialized.");
     }
 
     private void DrawError(string err)
@@ -96,6 +101,7 @@ public class LevelsEditor : EditorWindow
         // Level info -----------
         _data.gridSize = EditorGUILayout.IntField("Grid Size", _data.gridSize);
         _data.inactiveCells = EditorGUILayout.IntField("Inactive Cells", _data.inactiveCells);
+        _data.activableCellsCount = EditorGUILayout.IntField("Activable Cells Count", _data.activableCellsCount);
 
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.LabelField("Show Positions: ");
@@ -357,10 +363,19 @@ public class LevelsEditor : EditorWindow
     private void SaveLevel()
     {
         List<Vec2> path = new List<Vec2>();
+        string levelData = "";
 
         if (_pathInfo.found)
         {
-            _pathInfo.path.ForEach(e => path.Add(new Vec2(e.x, e.y)));
+            _pathInfo.path.ForEach(e =>
+            {
+                path.Add(new Vec2(e.x, e.y));
+            });
+        }
+
+        for (int a = 0; a < _data.data.Length; ++a)
+        {
+            levelData += _data.data[a];
         }
 
         LevelData data = new LevelData()
@@ -369,7 +384,9 @@ public class LevelsEditor : EditorWindow
             pathFound = _pathInfo.found,
             randomizerSeed = _randomizerSeed,
             inactiveCells = _data.inactiveCells,
-            gridSize = _data.gridSize
+            activableCellsCount = _data.activableCellsCount,
+            gridSize = _data.gridSize,
+            levelData = levelData
         };
 
         string filePath = Application.dataPath + "/SavedLevels/";
