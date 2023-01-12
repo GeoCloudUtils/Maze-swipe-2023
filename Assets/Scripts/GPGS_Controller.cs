@@ -4,34 +4,34 @@ using GooglePlayGames.BasicApi;
 
 public class GPGS_Controller : MonoBehaviour
 {
-    public PlayGamesClientConfiguration clientConfiguration;
+    //public PlayGamesClientConfiguration clientConfiguration;
 
-    private void Start()
-    {
-        Configure();
-        SignIntoGPGS(SignInInteractivity.CanPromptAlways, clientConfiguration);
-    }
+    //private void Start()
+    //{
+    //    Configure();
+    //    SignIntoGPGS(SignInInteractivity.CanPromptAlways, clientConfiguration);
+    //}
 
     internal void Configure()
     {
-        clientConfiguration = new PlayGamesClientConfiguration.Builder().Build();
+       // clientConfiguration = new PlayGamesClientConfiguration.Builder().Build();
     }
 
-    internal void SignIntoGPGS(SignInInteractivity interactivity, PlayGamesClientConfiguration configuration)
+    internal void SignIntoGPGS(SignInInteractivity interactivity, object configuration)
     {
-        configuration = clientConfiguration;
-        PlayGamesPlatform.InitializeInstance(configuration);
-        PlayGamesPlatform.Activate();
-        PlayGamesPlatform.Instance.Authenticate(interactivity, (code) =>
-        {
-            if (code == SignInStatus.Success)
-            {
-                Debug.Log($"Authentification complete. Data: {Social.localUser.userName}. {Social.localUser.id}");
-            }
-            else
-            {
-                Debug.LogWarning($"Authentification failed! Reason: {code}");
-            }
-        });
+        //configuration = clientConfiguration;
+        //PlayGamesPlatform.InitializeInstance(configuration);
+        //PlayGamesPlatform.Activate();
+        //PlayGamesPlatform.Instance.Authenticate(interactivity, (code) =>
+        //{
+        //    if (code == SignInStatus.Success)
+        //    {
+        //        Debug.Log($"Authentification complete. Data: {Social.localUser.userName}. {Social.localUser.id}");
+        //    }
+        //    else
+        //    {
+        //        Debug.LogWarning($"Authentification failed! Reason: {code}");
+        //    }
+        //});
     }
 }

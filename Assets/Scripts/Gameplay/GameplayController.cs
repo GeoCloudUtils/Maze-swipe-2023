@@ -259,11 +259,11 @@ public class GameplayController : MonoBehaviour
 
     private void IncrementAchievement(string achievement)
     {
-        PlayGamesPlatform platform = (PlayGamesPlatform)Social.Active;
-        platform.IncrementAchievement(achievement, 1, (bool succes) =>
-        {
+        //PlayGamesPlatform platform = (PlayGamesPlatform)Social.Active;
+        //platform.IncrementAchievement(achievement, 1, (bool succes) =>
+        //{
 
-        });
+        //});
     }
 
     int moves = 0;
