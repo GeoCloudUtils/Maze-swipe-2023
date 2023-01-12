@@ -63,7 +63,7 @@ public class MazeSpawner : MonoBehaviour
             if (cellData == 2)
             {
                 playerInstance = Instantiate(player, cell.transform);
-                playerInstance.CurrentCell = cell;
+                playerInstance.currentCell = cell;
                 playerInstance.transform.localPosition = Vector3.zero;
                 playerInstance.transform.DOScale(1f, 0.5f).From(0f).SetDelay(0.5f).SetEase(Ease.OutExpo);
             }
@@ -109,7 +109,7 @@ public class MazeSpawner : MonoBehaviour
 
         foreach (Cell cell in gridCells)
         {
-            cell.enableCheck = true;
+            cell.captureEvents = true;
         }
         playerInstance.gridCells = gridCells;
         SpawnComplete?.Invoke(playerInstance, gridCells.ToArray());

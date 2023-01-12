@@ -1,45 +1,30 @@
 using DG.Tweening;
 using GooglePlayGames;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.SocialPlatforms;
-using UnityEngine.UI;
 
-public class GameplayController : MonoBehaviour
+public class GameplayController : Singleton<GameplayController>
 {
-    private static GameplayController _instance;
-    public static GameplayController Instance { get { return _instance; } }
-
-    public int ActivableCellsCount { get => activableCellsCount; private set => activableCellsCount = value; }
-
-    [SerializeField] private GameObject rewardAdPanel;
-
-   
-
+    [SerializeField] private UIRewardRequestScreen rewardRequestScreen;
+    [SerializeField] private UIFinishScreen finishScreen;
+    [SerializeField] private GameViewController gameViewController;
     [SerializeField] private InterstitialAdButton reloadButton;
-
-    [SerializeField] private Button debugReset;
-
     [SerializeField] private TMP_Text levelText;
     [SerializeField] private TMP_Text movesText;
 
     [SerializeField] private GameObject activableCellPrefab;
-
     [SerializeField] private Transform activableCellContainer;
-
     [SerializeField] private MazeSpawner spawner;
-
     [SerializeField] private LevelsDefinition levelDefinition;
-
     [SerializeField] private InputManager inputManager;
     [SerializeField] private Transform spawnContainer;
 
     [SerializeField] private bool canSwipe = false;
-
-    [Header("Testing")]
-    public bool testMode = false;
 
     [SerializeField] private int mazeIndex = 0;
     [SerializeField] private int collectablesCount = 0;
@@ -50,31 +35,28 @@ public class GameplayController : MonoBehaviour
 
     [SerializeField] private List<GameObject> activableCellsList = new List<GameObject>();
 
-    private readonly List<string> achievementsList = new List<string>();
+    public bool SpawnComplete { get => spawnComplete; private set => spawnComplete = value; }
+    public int ActivableCellsCount { get => activableCellsCount; private set => activableCellsCount = value; }
+    public int cellDestroyCost = 2;
+    public List<Cell> LevelCells => levelCells;
 
-    private int totalMoves = 0;
+    private readonly List<string> achievementsList = new List<string>();
+    private List<Cell> levelCells = new List<Cell>();
 
     private int reloadCount = 0;
-
     private Player player;
+    private Cell clickedCell;
+    private bool spawnComplete = false;
+    private bool levelComplete = false;
 
-    private void Awake()
-    {
-        if (_instance != null && _instance != this)
-        {
-            Destroy(this.gameObject);
-        }
-        else
-        {
-            _instance = this;
-        }
-    }
+    private int currentLevelIndex;
+    private int score;
+    private int diamonds;
+    private int totalMoves = 0;
+    [SerializeField] private int levelScore = 0;
+    private readonly int diamondsRewardCount = 3;
 
-    public void AddMoves(int count)
-    {
-        movesLeft += count;
-        movesText.SetText(movesLeft.ToString());
-    }
+    private int levelTotalPoints = 720;
 
     private void Start()
     {
@@ -90,26 +72,39 @@ public class GameplayController : MonoBehaviour
         achievementsList.Add(GPGSIds.achievement_master);
 
         reloadButton.OnInterstitialAdButtonClick += DoReload;
-        debugReset.onClick.AddListener(DoReset);
-        if (!testMode)
-        {
-            if (!PlayerPrefs.HasKey("MAZE_INDEX"))
-            {
-                PlayerPrefs.SetInt("MAZE_INDEX", 0);
-            }
-            mazeIndex = PlayerPrefs.GetInt("MAZE_INDEX");
-        }
+        rewardRequestScreen.OnRewardAdComplete += GetReward;
+
         RunNextLevel();
+
         reloadCount = PlayerPrefs.GetInt("ReloadCount");
+        finishScreen.OnNext += RunNextLevel;
     }
 
-    ///debug
-    private void DoReset()
+    /// <summary>
+    /// Callback on reward ad complete
+    /// Give's moves or diamonds based on reward type
+    /// </summary>
+    /// <param name="rewardType"></param>
+    private void GetReward(RewardType rewardType)
     {
-        PlayerPrefs.DeleteAll();
-        DoReload();
+        if (rewardType == RewardType.MOVES)
+        {
+            movesLeft += 3; // ??
+            movesText.SetText(movesLeft.ToString());
+        }
+        else
+        {
+            DataManager.Instance.currentData.diamonds += diamondsRewardCount;
+            clickedCell.isElementActive = false;
+            clickedCell.SetState(0.1f);
+        }
+        rewardRequestScreen.Hide();
     }
 
+    /// <summary>
+    /// Reload callback but saving reload count
+    /// Used to show interstitial ads
+    /// </summary>
     private void DoReload()
     {
         reloadCount++;
@@ -124,25 +119,36 @@ public class GameplayController : MonoBehaviour
         Reload();
     }
 
+    /// <summary>
+    /// Reload current level
+    /// </summary>
     public void Reload()
     {
         SceneManager.LoadScene(0);
     }
 
+    /// <summary>
+    /// Run next level
+    /// </summary>
     private void RunNextLevel()
     {
+        finishScreen.Hide();
+        gameViewController.Show();
+        inputManager.gameObject.SetActive(true);
+
         if (mazeIndex > levelDefinition.AllLevels.Count - 1)
         {
             Debug.LogWarning("NO MORE LEVELS!");
+            //to do
             return;
         }
+        levelScore = levelTotalPoints;
         mazeData = levelDefinition.AllLevels[mazeIndex];
         movesLeft = mazeData.maxMoves + 1;
+        movesText.SetText(movesLeft.ToString());
 
-        Debug.Log("Level data: " + mazeData.levelData);
         spawner.Init(mazeData);
         mazeIndex++;
-        moves = 0;
 
         if (activableCellsList.Count > 0)
         {
@@ -162,150 +168,243 @@ public class GameplayController : MonoBehaviour
         activableCellsCount = mazeData.activableCellsCount;
         levelText.SetText($"Level {mazeIndex}");
         totalMoves = 0;
-        LevelTimer.Instance.SetTimerRunning(true);
+        levelComplete = false;
+        canSwipe = true;
     }
 
+    /// <summary>
+    /// Level spawn complete callback
+    /// Activate all cells events
+    /// </summary>
+    /// <param name="player"></param>
+    /// <param name="cells"></param>
     private void OnSpawnComplete(Player player, Cell[] cells)
     {
         inputManager.OnSwipe += OnSwipe;
         this.player = player;
-        this.player.MoveComplete += OnPlayerMoveCompleted;
-        this.player.Init();
+        this.player.captureInputEvents = true;
+        levelCells = cells.ToList();
         foreach (var cell in cells)
         {
-            cell.OnCellEnabled += CellEnabled;
+            cell.OnCellClickDelegate += OnCellClick;
         }
+        SpawnComplete = true;
     }
 
-    private void CellEnabled()
+    /// <summary>
+    /// Callback on maze cell enabled
+    /// Remove activable cells if exist
+    /// </summary>
+    private void OnCellClick(ActionType actionType, Cell clickedCell)
     {
-        activableCellsCount--;
-        activableCellsList[activableCellsCount].transform.DOScale(0f, 0.25f).From(1.1f).SetEase(Ease.InOutBack).OnComplete(() =>
+        this.clickedCell = clickedCell;
+        if (actionType == ActionType.ACTIVABLE_CELL_REQUEST)
         {
-            activableCellsList[activableCellsCount].SetActive(false);
-        });
-    }
-
-    private void OnPlayerMoveCompleted(bool reachFinish)
-    {
-        movesLeft--;
-        if (movesLeft < 0)
-        {
-            movesLeft = 0;
+            activableCellsCount--;
+            activableCellsList[activableCellsCount].transform.DOScale(0f, 0.25f).From(1.1f).SetEase(Ease.InOutBack).OnComplete(() =>
+            {
+                activableCellsList[activableCellsCount].SetActive(false);
+            });
         }
-        movesText.SetText(movesLeft.ToString());
-        if (reachFinish)
+        else if (actionType == ActionType.DIAMONDS_REQUEST)
         {
-            Debug.Log("END LEVEL!");
-            SoundController.Instance.Play(SoundController.SoundType.WIN);
-#if UNITY_EDITOR
-            int defMoves = levelDefinition.AllLevels[mazeIndex - 1].maxMoves;
-            if (defMoves > 0)
-            {
-                if (defMoves > moves)
-                {
-                    levelDefinition.AllLevels[mazeIndex - 1].maxMoves = moves;
-                }
-            }
-            else
-            {
-                levelDefinition.AllLevels[mazeIndex - 1].maxMoves = moves;
-            }
-#endif
-            foreach (var achievement in achievementsList)
-            {
-                IncrementAchievement(achievement);
-            }
-            Social.LoadScores(GPGSIds.leaderboard_players, scores =>
-            {
-                if (scores.Length > 0)
-                {
-                    Debug.Log("Got " + scores.Length + " scores");
-                    string myScores = "Leaderboard:\n";
-                    foreach (IScore score in scores)
-                    {
-                        myScores += "\t" + score.userID + " " + score.formattedValue + " " + score.date + "\n";
-                    }
-                    Debug.Log(myScores);
-                }
-                else
-                    Debug.Log("No scores loaded");
-            });
-            LevelTimer.Instance.SetTimerRunning(false);
-            int score = LevelTimer.Instance.GetPoints();
-            Social.ReportScore(score * 100, GPGSIds.leaderboard_players, (succes) =>
-            {
-
-            });
-            PlayerPrefs.SetInt("MAZE_INDEX", mazeIndex);
-            Invoke(nameof(RunNextLevel), 1.0f);
-            return;
+            rewardRequestScreen.Show(RewardType.DIAMONDS);
         }
         else
         {
-            if (!testMode)
+            DataManager.Instance.currentData.diamonds -= cellDestroyCost;
+            if (DataManager.Instance.currentData.diamonds < 0)
             {
-                if (movesLeft <= 0)
-                {
-                    Debug.Log("LEVEL FAIL!");
-                    SoundController.Instance.Play(SoundController.SoundType.LOST);
-                    rewardAdPanel.SetActive(true);
-                    canSwipe = false;
-                }
+                DataManager.Instance.currentData.diamonds = 0;
             }
         }
-        canSwipe = true;
     }
 
-    private void IncrementAchievement(string achievement)
+    /// <summary>
+    /// Callback on player move complete
+    /// Check's if player reach the end 
+    /// </summary>
+    /// <param name="reachFinish"></param>
+    private void LevelWin()
     {
-        //PlayGamesPlatform platform = (PlayGamesPlatform)Social.Active;
-        //platform.IncrementAchievement(achievement, 1, (bool succes) =>
-        //{
-
-        //});
-    }
-
-    int moves = 0;
-    private void OnSwipe(InputManager.Direction swipeDirection)
-    {
-        if (!canSwipe)
+        if (levelComplete)
         {
             return;
+        };
+        foreach (Cell cell in LevelCells)
+        {
+            cell.captureEvents = false;
         }
-        if (!testMode)
+        player = null;
+        levelComplete = true;
+        SoundController.Instance.PlaySfx(SoundController.SoundType.WIN);
+#if UNITY_EDITOR
+        int defMoves = levelDefinition.AllLevels[mazeIndex - 1].maxMoves;
+        if (defMoves > 0)
+        {
+            if (defMoves > totalMoves)
+            {
+                levelDefinition.AllLevels[mazeIndex - 1].maxMoves = totalMoves;
+            }
+        }
+        else
+        {
+            levelDefinition.AllLevels[mazeIndex - 1].maxMoves = totalMoves;
+        }
+#endif
+        foreach (var achievement in achievementsList)
+        {
+            IncrementAchievement(achievement);
+        }
+
+        ///to remove
+        ///not in use
+        Social.LoadScores(GPGSIds.leaderboard_players, scores =>
+        {
+            if (scores.Length > 0)
+            {
+                Debug.Log("Got " + scores.Length + " scores");
+                string myScores = "Leaderboard:\n";
+                foreach (IScore score in scores)
+                {
+                    myScores += "\t" + score.userID + " " + score.formattedValue + " " + score.date + "\n";
+                }
+                Debug.Log(myScores);
+            }
+            else
+                Debug.Log("No scores loaded");
+        });
+        ///------------------
+        ///
+        StartCoroutine(OnFinishCoroutine());
+        return;
+    }
+
+
+    /// <summary>
+    /// Coroutine on level complete
+    /// Show's finish screen and calculate results
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator OnFinishCoroutine()
+    {
+        yield return new WaitForSeconds(1f);
+        inputManager.gameObject.SetActive(false);
+        gameViewController.Hide();
+        finishScreen.Show(GetLevelResults());
+        Social.ReportScore(score, GPGSIds.leaderboard_players, (succes) =>
+        {
+            //need to do something? =/
+        });
+    }
+
+    /// <summary>
+    /// Calculate level results
+    /// </summary>
+    /// <returns></returns>
+    private LevelResults GetLevelResults()
+    {
+        currentLevelIndex = mazeIndex;
+
+        int guarantedPoints = 25;
+        score = Mathf.Max(levelScore, guarantedPoints);
+
+        diamonds = UnityEngine.Random.Range(1, 4);// get 1 , 2 or 3 diamonds per level
+        return new LevelResults
+        {
+            level = currentLevelIndex,
+            score = score,
+            diamonds = diamonds,
+            moves = totalMoves,
+            reward = diamondsRewardCount
+        };
+    }
+
+    /// <summary>
+    /// Callback for increasing achievements by name
+    /// </summary>
+    /// <param name="achievement"></param>
+    private void IncrementAchievement(string achievement)
+    {
+        PlayGamesPlatform platform = (PlayGamesPlatform)Social.Active;
+        platform.IncrementAchievement(achievement, 1, (bool succes) =>
+        {
+            //need to do something? =/
+        });
+    }
+
+    /// <summary>
+    /// Callback on maze swipe
+    /// Check's direction and rotate maze by angle
+    /// </summary>
+    /// <param name="swipeDirection"></param>
+    private void OnSwipe(InputManager.Direction swipeDirection)
+    {
+        if (!canSwipe || player.isMoving) { return; }
+        if (swipeDirection == InputManager.Direction.Left || swipeDirection == InputManager.Direction.Right)
         {
             if (movesLeft <= 0)
             {
-                rewardAdPanel.SetActive(true);
+                rewardRequestScreen.Show(RewardType.MOVES);
                 return;
             }
         }
         switch (swipeDirection)
         {
             case InputManager.Direction.Left:
-                RotatePanel(-90f);
+                RotateMaze(-90f);
                 break;
             case InputManager.Direction.Right:
-                RotatePanel(90f);
+                RotateMaze(90f);
                 break;
             case InputManager.Direction.Up:
+                gameViewController.ShowMenuPanel();
                 break;
             default:
                 break;
         }
     }
 
-    private void RotatePanel(float angle)
+    /// <summary>
+    /// Main maze rotate function
+    /// Rotate maze using smooth tween
+    /// </summary>
+    /// <param name="angle"></param>
+    private void RotateMaze(float angle)
     {
-        SoundController.Instance.Play(SoundController.SoundType.SWIPE);
+        player.captureInputEvents = false;
+        SoundController.Instance.PlaySfx(SoundController.SoundType.SWIPE);
         canSwipe = false;
         Vector3 currentRotation = spawnContainer.eulerAngles;
         Vector3 newRotation = new Vector3(currentRotation.x, currentRotation.y, Mathf.RoundToInt(currentRotation.z + angle));
+        movesLeft--;
+        movesText.SetText(movesLeft.ToString());
         spawnContainer.DORotate(newRotation, .5f).SetEase(Ease.OutExpo).OnComplete(() =>
         {
-            player.Init();
+            totalMoves++;
+            canSwipe = true;
+            player.captureInputEvents = true;
+            int decreasePerMove = 25;
+            if (totalMoves > mazeData.maxMoves)
+            {
+                levelScore -= decreasePerMove;
+            }
         });
-        moves++;
+    }
+
+    private void Update()
+    {
+        if (player != null)
+        {
+            if (player.isMoving)
+            {
+                return;
+            }
+            if (player.isOnEndCell)
+            {
+                canSwipe = false;
+                LevelWin();
+            }
+        }
     }
 }

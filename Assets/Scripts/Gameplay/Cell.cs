@@ -3,10 +3,15 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 
-public class Cell : MonoBehaviour
+public enum ActionType
 {
-    [SerializeField] private Image image;
+    DESTROY = 0,
+    ACTIVABLE_CELL_REQUEST = 1,
+    DIAMONDS_REQUEST = 2
+}
 
+public class Cell : GameViewElement
+{
     [SerializeField] private Button button;
 
     [SerializeField] private Player player;
@@ -15,7 +20,6 @@ public class Cell : MonoBehaviour
 
     [SerializeField] private Vector2Int position;
 
-    [SerializeField] private bool isEnabled = true;
     [SerializeField] private bool isStart = false;
     [SerializeField] private bool isEnd = false;
     [SerializeField] private bool hasCollectable = false;
@@ -24,28 +28,29 @@ public class Cell : MonoBehaviour
 
     public Vector2Int Position { get => position; set => position = value; }
     public Image Image { get => image; set => image = value; }
-    public bool IsEnabled { get => isEnabled; private set => isEnabled = value; }
     public bool IsStart { get => isStart; private set => isStart = value; }
     public bool IsEnd { get => isEnd; private set => isEnd = value; }
 
-    public bool enableCheck = false;
+    public bool captureEvents = false;
     public bool HasCollectable { get; set; }
     public RectTransform Rect { get => rect; private set => rect = value; }
     public Player Player { get => player; private set => player = value; }
 
-    public event Action OnCellEnabled;
+    public event Action<ActionType, Cell> OnCellClickDelegate;
+
 
     public void Init(bool isActve, bool isStartPoint, bool isEndEndPoint, bool hasCollectable = false)
     {
         SetState(isActve ? 1f : 0.1f);
-        IsEnabled = isActve;
+        this.isElementActive = isActve;
         this.IsStart = isStartPoint;
         this.IsEnd = isEndEndPoint;
         this.HasCollectable = hasCollectable;
         button.onClick.AddListener(OnCellClick);
+        GameViewController.Instance.OnColorSchemeChange += ChangeColor;
     }
 
-    private void SetState(float state)
+    public void SetState(float state)
     {
         Color imgColor = Image.color;
         imgColor.a = state;
@@ -54,15 +59,32 @@ public class Cell : MonoBehaviour
 
     private void OnCellClick()
     {
-        if (IsEnabled || IsNotEmpty() || hasCollectable || isEnd)
+        if (!captureEvents) { return; }
+        if (isElementActive)
+        {
+            int diamonds = DataManager.Instance.currentData.diamonds;
+            int destroyCost = GameplayController.Instance.cellDestroyCost;
+            bool haveEnoughDiamonds = diamonds - destroyCost >= 0;
+            if (haveEnoughDiamonds)
+            {
+                isElementActive = false;
+                SetState(0.1f);
+                OnCellClickDelegate?.Invoke(ActionType.DESTROY, this);
+            }
+            else
+            {
+                OnCellClickDelegate?.Invoke(ActionType.DIAMONDS_REQUEST, this);
+            }
+        }
+        if (isElementActive || IsNotEmpty() || hasCollectable || isEnd)
         {
             return;
         }
         if (GameplayController.Instance.ActivableCellsCount > 0)
         {
-            IsEnabled = true;
+            isElementActive = true;
             SetState(1);
-            OnCellEnabled?.Invoke();
+            OnCellClickDelegate?.Invoke(ActionType.ACTIVABLE_CELL_REQUEST, this);
             Image.transform.DOScale(1f, 0.25f).From(1.1f).SetEase(Ease.OutBack);
         }
     }
@@ -74,7 +96,7 @@ public class Cell : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (enableCheck)
+        if (captureEvents)
         {
             Collider[] hitColliders = Physics.OverlapBox(gameObject.transform.position, new Vector3(0.1f, 0.1f, 1f), Quaternion.identity, m_LayerMask);
             if (hitColliders.Length > 0)
@@ -88,7 +110,7 @@ public class Cell : MonoBehaviour
     void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        if (enableCheck)
+        if (captureEvents)
         {
             Gizmos.DrawWireCube(transform.position, new Vector3(0.1f, 0.1f, 1f));
         }

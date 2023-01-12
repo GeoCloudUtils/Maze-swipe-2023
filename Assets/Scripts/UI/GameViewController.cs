@@ -2,48 +2,109 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-
-public class GameViewController : MonoBehaviour
+public enum ColorScheme
 {
+    LIGHT = 0,
+    DARK = 1
+}
+
+public class GameViewController : Singleton<GameViewController>
+{
+    [Header("General references")]
+    [SerializeField] private GameObject _root;
+
     [SerializeField] private GameObject menu;
 
     [SerializeField] private Button menuButton;
 
     [SerializeField] private Image sfxImage;
     [SerializeField] private Image musicImage;
+    [SerializeField] private Image colorSchemeImage;
 
     [SerializeField] private Sprite sfxInactiveSprite;
     [SerializeField] private Sprite sfxActiveSprite;
     [SerializeField] private Sprite musicInactiveSprite;
     [SerializeField] private Sprite musicActiveSprite;
 
+    [SerializeField] private Sprite colorSchemeDarkSprite;
+    [SerializeField] private Sprite colorSchemeLightSprite;
+
     [SerializeField] private Button soundButton;
     [SerializeField] private Button sfxButton;
     [SerializeField] private Button iapButton;
     [SerializeField] private Button leaderboardButton;
     [SerializeField] private Button achievementsButton;
+    [SerializeField] private Button colorSchemeChangeButton;
 
-    [SerializeField] private float hideDelay = 5f;
+    [Header("General settings")]
+    [SerializeField] private float menuHideDelay = 5f;
 
+    [SerializeField] private float colorSwitchSpeed = 0.5f;
 
-    private void Start()
-    {
-        soundButton.onClick.AddListener(() => SetSound(true));
-        sfxButton.onClick.AddListener(() => SetSfx(true));
-        iapButton.onClick.AddListener(SetIap);
-        leaderboardButton.onClick.AddListener(ShowLeaderboard);
-        achievementsButton.onClick.AddListener(ShowAchievements);
-        if (!PlayerPrefs.HasKey("SFX"))
-        {
-            PlayerPrefs.SetInt("SFX", 1);
-        }
-        SetSfx(false);
-        SetSound(false);
-        menuButton.onClick.AddListener(OpenMenu);
-    }
 
     private Coroutine menuCoroutine;
-    private void OpenMenu()
+
+    public event Action<ColorScheme, float> OnColorSchemeChange;
+
+    public void Show()
+    {
+        _root.SetActive(true);
+    }
+
+    public void Hide()
+    {
+        _root.SetActive(false);
+    }
+
+    private IEnumerator Start()
+    {
+        soundButton.onClick.AddListener(() => OnSoundButtonClick());
+
+        sfxButton.onClick.AddListener(() => OnSfxButtonClick());
+
+        iapButton.onClick.AddListener(OnIapButtonClick);
+
+        leaderboardButton.onClick.AddListener(ShowLeaderboard);
+
+        achievementsButton.onClick.AddListener(ShowAchievements);
+
+        colorSchemeChangeButton.onClick.AddListener(() => ChangeColorScheme());
+
+        menuButton.onClick.AddListener(ShowMenuPanel);
+
+        while (!GameplayController.Instance.SpawnComplete)
+        {
+            yield return null;
+        }
+
+        musicImage.sprite = DataManager.Instance.Settings.sound == true ? musicActiveSprite : musicInactiveSprite;
+        sfxImage.sprite = DataManager.Instance.Settings.sfx == true ? sfxActiveSprite : sfxInactiveSprite;
+
+        colorSchemeImage.sprite = DataManager.Instance.ColorScheme == ColorScheme.LIGHT ? colorSchemeLightSprite : colorSchemeDarkSprite;
+        SoundController.Instance.PlayMusic();
+    }
+
+    /// <summary>
+    /// Callback on color scheme changed
+    /// </summary>
+    private void ChangeColorScheme()
+    {
+        ColorScheme currentScheme = DataManager.Instance.ColorScheme;
+
+        ColorScheme newColorScheme = currentScheme == ColorScheme.LIGHT ? ColorScheme.DARK : ColorScheme.LIGHT;
+
+        OnColorSchemeChange?.Invoke(newColorScheme, colorSwitchSpeed);
+
+        DataManager.Instance.currentData.colorScheme = newColorScheme;
+
+        colorSchemeImage.sprite = newColorScheme == ColorScheme.LIGHT ? colorSchemeLightSprite : colorSchemeDarkSprite;
+        CancelMenuHide();
+    }
+
+    /// <summary>
+    /// Callback to show bottom menu
+    /// </summary>
+    public void ShowMenuPanel()
     {
         menuButton.gameObject.SetActive(false);
         if (menuCoroutine != null)
@@ -54,14 +115,21 @@ public class GameViewController : MonoBehaviour
         menuCoroutine = StartCoroutine(MenuHideCoroutine());
     }
 
+    /// <summary>
+    /// Coroutine to hide bottom menu after some delay
+    /// </summary>
+    /// <returns></returns>
     private IEnumerator MenuHideCoroutine()
     {
-        yield return new WaitForSeconds(hideDelay);
+        yield return new WaitForSeconds(menuHideDelay);
         menu.SetActive(false);
         menuCoroutine = null;
         menuButton.gameObject.SetActive(true);
     }
 
+    /// <summary>
+    /// Callback to cancel hide bottom menu
+    /// </summary>
     private void CancelMenuHide()
     {
         if (menuCoroutine != null)
@@ -71,66 +139,74 @@ public class GameViewController : MonoBehaviour
         menuCoroutine = StartCoroutine(MenuHideCoroutine());
     }
 
+    /// <summary>
+    /// Callback to show achievements screen
+    /// Also cancel menu hide on click
+    /// </summary>
     private void ShowAchievements()
     {
         Social.ShowAchievementsUI();
         CancelMenuHide();
     }
 
+    /// <summary>
+    /// Callback to show leaderboard screen
+    /// Also cancel menu hide on click
+    /// </summary>
     private void ShowLeaderboard()
     {
         Social.ShowLeaderboardUI();
         CancelMenuHide();
     }
 
-    private void SetIap()
+    /// <summary>
+    /// Callback for IAP purchases
+    /// Also cancel menu hide on click
+    /// </summary>
+    private void OnIapButtonClick()
     {
+        CancelMenuHide();
+        //to do
+    }
+
+    /// <summary>
+    /// Callback for change and save sfx setting
+    /// Also cancel menu hide on click
+    /// </summary>
+    /// <param name="save"></param>
+    private void OnSfxButtonClick()
+    {
+        if (DataManager.Instance.Settings.sfx == true)
+        {
+            DataManager.Instance.Settings.sfx = false;
+            sfxImage.sprite = sfxInactiveSprite;
+        }
+        else
+        {
+            DataManager.Instance.Settings.sfx = true;
+            sfxImage.sprite = sfxActiveSprite;
+        }
         CancelMenuHide();
     }
 
-    private void SetSfx(bool save)
+    /// <summary>
+    /// Callback for change and save sound setting
+    /// Also cancel menu hide on click
+    /// </summary>
+    /// <param name="save"></param>
+    private void OnSoundButtonClick()
     {
-        if (save)
+        if (DataManager.Instance.Settings.sound == true)
         {
-            if (!PlayerPrefs.HasKey("SFX"))
-            {
-                PlayerPrefs.SetInt("SFX", 1);
-            }
-            if (PlayerPrefs.GetInt("SFX") == 0)
-            {
-                PlayerPrefs.SetInt("SFX", 1);
-            }
-            else
-            {
-                PlayerPrefs.SetInt("SFX", 0);
-            }
+            DataManager.Instance.Settings.sound = false;
+            musicImage.sprite = musicInactiveSprite;
         }
-        bool isActive = PlayerPrefs.GetInt("SFX") == 1;
-        sfxImage.sprite = isActive ? sfxActiveSprite : sfxInactiveSprite;
-        CancelMenuHide();
-    }
-
-    private void SetSound(bool save)
-    {
-        if (save)
+        else
         {
-            if (!PlayerPrefs.HasKey("MUSIC"))
-            {
-                PlayerPrefs.SetInt("MUSIC", 1);
-            }
-            if (PlayerPrefs.GetInt("MUSIC") == 1)
-            {
-                SoundController.Instance.StopMusic();
-                PlayerPrefs.SetInt("MUSIC", 0);
-            }
-            else
-            {
-                PlayerPrefs.SetInt("MUSIC", 1);
-                SoundController.Instance.PlayMusic();
-            }
+            DataManager.Instance.Settings.sound = true;
+            musicImage.sprite = musicActiveSprite;
         }
-        bool isActive = PlayerPrefs.GetInt("MUSIC") == 1;
-        musicImage.sprite = isActive ? musicActiveSprite : musicInactiveSprite;
+        SoundController.Instance.PlayMusic();
         CancelMenuHide();
     }
 }
